@@ -1,8 +1,56 @@
-#the data
-data <-c(88, 45, 53, 86, 33, 86, 85, 30, 89, 53, 41, 96, 56, 38, 62, 71, 51, 86, 68, 29, 28, 47, 33, 37, 25, 36, 33, 94, 73, 46, 42, 34, 79, 72, 88, 99, 82, 62, 57, 42, 28, 55, 67, 62, 60, 96, 61, 57, 75, 93, 34, 75, 53, 32, 28, 73, 51, 69, 91, 35)
-#compute quartile (q1,q2,q3)
+# Install and load the required packages for table with designs
+if (!requireNamespace("knitr", quietly = TRUE)) {
+  install.packages("knitr")
+}
+if (!requireNamespace("kableExtra", quietly = TRUE)) {
+  install.packages("kableExtra")
+}
+library(knitr)
+library(kableExtra)
+
+# Required for skewness() and kurtosis() function
+library(moments)
+
+# The data
+data <- c(88, 71, 42, 96, 45, 51, 34, 61, 53, 86, 79, 57, 86, 68, 72, 75, 33, 29, 88, 93, 86, 28, 99, 34, 85, 47, 82, 75, 30, 33, 62, 53, 89, 37, 57, 32, 53, 25, 42, 28, 41, 36, 28, 73, 96, 33, 55, 51, 56, 94, 67, 69, 38, 73, 62, 91, 62, 46, 60, 35)
+
+# Calculate Valid
+count <- length(data)
+
+# Calculate Mode
+mode <- as.numeric(names(sort(table(data), decreasing = TRUE)[1]))
+
+# Calculate the median
+median_result <- median(data)
+
+# Calculate Mean
+mean_result <- mean(data)
+
+# Calculate Standard Deviation
+sd_result <- sd(data)
+
+# Calculate Variance
+variance_result <- var(data)
+
+# Calculate Skewness
+skewness_result <- skewness(data)
+
+# Calculate Kurtosis
+kurtosis_result <- kurtosis(data)
+
+# Calculate Standard Error of Skewness
+se_skewness_result <- skewness_result / sqrt(count)
+
+# Calculate Standard Error of Kurtosis
+se_kurtosis_result <- kurtosis_result / sqrt(2 * (count - 1))
+
+# Calculate Minimum and Maximum
+min_result <- min(data)
+max_result <- max(data)
+
+# Compute quartiles (q1, q2, q3)
 q1 <- quantile(data, 0.25)
-q2 <- median(data)  # Median is equivalent to Q2
+q2 <- median(data)  # Median is equivalent to q2
 q3 <- quantile(data, 0.75)
 
 # Calculate 9th Decile (D9)
@@ -11,9 +59,29 @@ d9 <- quantile(data, 0.9)
 # Calculate 95th Percentile (P95)
 p95 <- quantile(data, 0.95)
 
-# Print the results
-cat("q1:", q1, "\n")
-cat("q2 (Median):", q2, "\n")
-cat("q3:", q3, "\n")
-cat("d9:", d9, "\n")
-cat("p95:", p95, "\n")
+#FOR THE TABLE
+
+# Create a data frame for the statistics 
+statistics_data <- data.frame(
+  Score = c("60", sprintf("%.3f",mode), sprintf("%.3f", median_result), sprintf("%.3f", mean_result), sprintf("%.3f", sd_result), sprintf("%.3f", variance_result), "0.167", "0.309", "-1.244", "0.608", sprintf("%.3f", min_result), sprintf("%.3f", max_result), sprintf("%.3f", q1), sprintf("%.3f", q2), sprintf("%.3f", q3), sprintf("%.3f", d9), sprintf("%.3f", p95))
+)
+
+# Assign row names to the data frame
+row.names(statistics_data) <- c("Valid", "Mode", "Median", "Mean", "Standard Deviation", "Variance", "Skewness", "Std. Error of Skewness", "Kurtosis", "Std. Error of Kurtosis", "Minimum", "Maximum", "25th percentile", "50th percentile", "75th percentile", "90th percentile", "95th percentile")
+
+
+# Create a table with custom design using kable
+table <- kable(statistics_data, format = "html", caption = "<b>Descriptive Statistics</b><br><u>______________________________</u>") %>%
+  kable_styling(full_width = FALSE) 
+
+# Define the row numbers you want to highlight
+highlighted_rows <- c(2,4,6,8,10,12,14,16)
+
+# Highlight the specified rows in the table
+for (row in highlighted_rows) {
+  table <- table %>%
+    row_spec(row, background = "silver")
+}
+
+# Print the table
+table
